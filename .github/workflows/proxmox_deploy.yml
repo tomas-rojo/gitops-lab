@@ -22,7 +22,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install ansible
-        ansible-galaxy collection install community.general community.proxmox
+        ansible-galaxy collection install community.proxmox --pre
 
     - name: Run Ansible Playbook
       env:
