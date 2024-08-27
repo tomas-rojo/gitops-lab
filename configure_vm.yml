@@ -3,8 +3,8 @@
   hosts: localhost
   gather_facts: no
   vars:
-    proxmox_host: "proxmox.example.com"
-    proxmox_user: "root@pam"
+    proxmox_host: "192.168.1.241:8006"
+    proxmox_user: "root"
     proxmox_password: "your_proxmox_password"
     node: "pve" # Replace with your Proxmox node name
     vm_id: 101  # Unique VM ID
