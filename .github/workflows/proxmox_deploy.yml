@@ -1,4 +1,4 @@
-name: Deploy Proxmox VM
+name: Start Proxmox VM
 
 on:
   push:
@@ -6,31 +6,20 @@ on:
       - main
 
 jobs:
-  deploy_vm:
+  start-vm:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
+      - name: Install Ansible
+        run: |
+          pip install ansible
 
-    - name: Install Ansible and Proxmox Collection
-      run: |
-        python -m pip install --upgrade pip
-        pip install ansible
-        ansible-galaxy collection install community.proxmox --pre
+      - name: Start Proxmox VM
+        run: |
+          ansible-playbook -i proxmox-host, configure_vm.yml
 
-    - name: Run Ansible Playbook
-      env:
-        PROXMOX_HOST: ${{ secrets.PROXMOX_HOST }}
-        PROXMOX_USER: ${{ secrets.PROXMOX_USER }}
-        PROXMOX_PASSWORD: ${{ secrets.PROXMOX_PASSWORD }}
-      run: |
-        ansible-playbook configure_vm.yml \
-          -e proxmox_host=$PROXMOX_HOST \
-          -e proxmox_user=$PROXMOX_USER \
-          -e proxmox_password=$PROXMOX_PASSWORD
+      - name: Wait for VM to start
+        run: |
+          sleep 60 # wait for 1 minute
