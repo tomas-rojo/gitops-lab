@@ -12,9 +12,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install Ansible
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Ansible, Proxmox Collection, and Proxmoxer
         run: |
-          pip install ansible
+          python -m pip install --upgrade pip
+          pip install ansible proxmoxer
 
       - name: Run Ansible Playbook
         env:
