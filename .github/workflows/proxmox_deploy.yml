@@ -14,7 +14,7 @@ jobs:
 
       - name: Install Ansible
         run: |
-          pip install ansible
+          pip install ansible ansible-galaxy community.proxmox
 
       - name: Run Ansible Playbook
         env:
