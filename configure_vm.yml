@@ -1,0 +1,52 @@
+---
+- name: Configure Ubuntu 24.04 VM on Proxmox
+  hosts: localhost
+  gather_facts: no
+  vars:
+    proxmox_host: "proxmox.example.com"
+    proxmox_user: "root@pam"
+    proxmox_password: "your_proxmox_password"
+    node: "pve" # Replace with your Proxmox node name
+    vm_id: 101  # Unique VM ID
+    vm_name: "ubuntu-vm"
+    storage: "local-lvm"
+    iso_storage: "local"
+    iso_file: "ubuntu-24.04-live-server-amd64.iso"
+    disk_size: "30G"
+    memory: 2048
+    cores: 2
+
+  tasks:
+    - name: Create VM on Proxmox
+      community.general.proxmox_kvm:
+        api_host: "{{ proxmox_host }}"
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        node: "{{ node }}"
+        vmid: "{{ vm_id }}"
+        name: "{{ vm_name }}"
+        memory: "{{ memory }}"
+        cores: "{{ cores }}"
+        storage: "{{ storage }}"
+        disks:
+          - size: "{{ disk_size }}"
+            storage: "{{ storage }}"
+            type: scsi
+            format: qcow2
+        cdrom:
+          storage: "{{ iso_storage }}"
+          file: "{{ iso_file }}"
+        boot: cdrom
+        net0: virtio,bridge=vmbr0
+      delegate_to: localhost
+      register: proxmox_task
+
+    - name: Start the VM
+      community.general.proxmox_kvm:
+        api_host: "{{ proxmox_host }}"
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        node: "{{ node }}"
+        vmid: "{{ vm_id }}"
+        state: started
+      delegate_to: localhost
