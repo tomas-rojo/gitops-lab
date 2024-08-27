@@ -5,7 +5,7 @@
   vars:
     proxmox_host: "192.168.1.241:8006"
     proxmox_user: "root"
-    proxmox_password: "your_proxmox_password"
+    proxmox_password: {{ secrets.PROXMOX_PASSWORD }}
     node: "pve" # Replace with your Proxmox node name
     vm_id: 101  # Unique VM ID
     vm_name: "ubuntu-vm"
@@ -27,26 +27,29 @@
         name: "{{ vm_name }}"
         memory: "{{ memory }}"
         cores: "{{ cores }}"
-        storage: "{{ storage }}"
-        disks:
-          - size: "{{ disk_size }}"
-            storage: "{{ storage }}"
-            type: scsi
-            format: qcow2
-        cdrom:
-          storage: "{{ iso_storage }}"
-          file: "{{ iso_file }}"
-        boot: cdrom
-        net0: virtio,bridge=vmbr0
+        state: present
       delegate_to: localhost
-      register: proxmox_task
-
-    - name: Start the VM
-      community.general.proxmox_kvm:
+    
+    - name: Add CDROM device to VM
+      community.general.proxmox_cdrom:
         api_host: "{{ proxmox_host }}"
         api_user: "{{ proxmox_user }}"
         api_password: "{{ proxmox_password }}"
         node: "{{ node }}"
         vmid: "{{ vm_id }}"
-        state: started
+        file: "{{ iso_file }}"
+        state: present
+      delegate_to: localhost
+    
+    - name: Add disks to VM
+      community.general.proxmox_disk:
+        api_host: "{{ proxmox_host }}"
+        api_user: "{{ proxmox_user }}"
+        api_password: "{{ proxmox_password }}"
+        node: "{{ node }}"
+        vmid: "{{ vm_id }}"
+        size: "{{ disk_size }}"
+        type: scsi
+        format: qcow2
+        state: present
       delegate_to: localhost
