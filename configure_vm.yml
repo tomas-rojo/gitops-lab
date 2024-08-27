@@ -16,37 +16,40 @@
     memory: 2048
     cores: 2
 
-  tasks:
-    - name: Create VM on Proxmox
-      community.general.proxmox_kvm:
-        api_host: "{{ proxmox_host }}"
-        api_user: "{{ proxmox_user }}"
-        api_password: "{{ proxmox_password }}"
-        node: "{{ node }}"
-        vmid: "{{ vm_id }}"
-        name: "{{ vm_name }}"
-        memory: "{{ memory }}"
-        cores: "{{ cores }}"
-        storage: "{{ storage }}"
-        disks:
-          - size: "{{ disk_size }}"
-            storage: "{{ storage }}"
-            type: scsi
-            format: qcow2
-        cdrom:
-          storage: "{{ iso_storage }}"
-          file: "{{ iso_file }}"
-        boot: cdrom
-        net0: virtio,bridge=vmbr0
-      delegate_to: localhost
-      register: proxmox_task
-
-    - name: Start the VM
-      community.general.proxmox_kvm:
-        api_host: "{{ proxmox_host }}"
-        api_user: "{{ proxmox_user }}"
-        api_password: "{{ proxmox_password }}"
-        node: "{{ node }}"
-        vmid: "{{ vm_id }}"
-        state: started
-      delegate_to: localhost
+tasks:
+   - name: Create VM on Proxmox
+     community.general.proxmox_kvm:
+      api_host: "{{ proxmox_host }}"
+      api_user: "{{ proxmox_user }}"
+      api_password: "{{ proxmox_password }}"
+      node: "{{ node }}"
+      vmid: "{{ vm_id }}"
+      name: "{{ vm_name }}"
+      memory: "{{ memory }}"
+      cores: "{{ cores }}"
+      state: present
+    delegate_to: localhost
+  
+  - name: Add CDROM device to VM
+    community.general.proxmox_cdrom:
+      api_host: "{{ proxmox_host }}"
+      api_user: "{{ proxmox_user }}"
+      api_password: "{{ proxmox_password }}"
+      node: "{{ node }}"
+      vmid: "{{ vm_id }}"
+      file: "{{ iso_file }}"
+      state: present
+    delegate_to: localhost
+  
+  - name: Add disks to VM
+    community.general.proxmox_disk:
+      api_host: "{{ proxmox_host }}"
+      api_user: "{{ proxmox_user }}"
+      api_password: "{{ proxmox_password }}"
+      node: "{{ node }}"
+      vmid: "{{ vm_id }}"
+      size: "{{ disk_size }}"
+      type: scsi
+      format: qcow2
+      state: present
+    delegate_to: localhost
