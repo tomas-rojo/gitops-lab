@@ -5,7 +5,7 @@
   vars:
     proxmox_host: "192.168.1.241:8006"
     proxmox_user: "root"
-    proxmox_password: "{{ secrets.PROXMOX_PASSWORD }}"
+    proxmox_password: "{{ proxmox_password }}"
     node: "pve" # Replace with your Proxmox node name
     vm_id: 101  # Unique VM ID
     vm_name: "ubuntu-vm"
