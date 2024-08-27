@@ -16,10 +16,13 @@ jobs:
         run: |
           pip install ansible
 
-      - name: Start Proxmox VM
+      - name: Run Ansible Playbook
+        env:
+          PROXMOX_HOST: ${{ secrets.PROXMOX_HOST }}
+          PROXMOX_USER: ${{ secrets.PROXMOX_USER }}
+          PROXMOX_PASSWORD: ${{ secrets.PROXMOX_PASSWORD }}
         run: |
-          ansible-playbook -i proxmox-host, configure_vm.yml
-
-      - name: Wait for VM to start
-        run: |
-          sleep 60 # wait for 1 minute
+          ansible-playbook configure_vm.yml \
+            -e proxmox_host=$PROXMOX_HOST \
+            -e proxmox_user=$PROXMOX_USER \
+            -e proxmox_password=$PROXMOX_PASSWORD
