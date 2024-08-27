@@ -27,24 +27,5 @@
         name: "{{ vm_name }}"
         memory: "{{ memory }}"
         cores: "{{ cores }}"
-        disks:
-          - size: "{{ disk_size }}"
-            storage: "{{ storage }}"
-            type: scsi
-            format: qcow2
-        cdrom:
-          storage: "{{ iso_storage }}"
-          file: "{{ iso_file }}"
-        net0: virtio,bridge=vmbr0
         state: present
-      delegate_to: localhost
-
-    - name: Start the VM
-      community.general.proxmox_kvm:
-        api_host: "{{ proxmox_host }}"
-        api_user: "{{ proxmox_user }}"
-        api_password: "{{ proxmox_password }}"
-        node: "{{ node }}"
-        vmid: "{{ vm_id }}"
-        state: started
       delegate_to: localhost
