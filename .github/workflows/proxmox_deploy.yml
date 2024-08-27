@@ -29,6 +29,5 @@ jobs:
           PROXMOX_PASSWORD: ${{ secrets.PROXMOX_PASSWORD }}
         run: |
           ansible-playbook configure_vm.yml \
-            -e proxmox_host=$PROXMOX_HOST \
             -e proxmox_user=$PROXMOX_USER \
             -e proxmox_password=$PROXMOX_PASSWORD
