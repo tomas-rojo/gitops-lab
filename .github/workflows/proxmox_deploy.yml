@@ -1,0 +1,36 @@
+name: Deploy Proxmox VM
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy_vm:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install Ansible and Proxmox Collection
+      run: |
+        python -m pip install --upgrade pip
+        pip install ansible
+        ansible-galaxy collection install community.general community.proxmox
+
+    - name: Run Ansible Playbook
+      env:
+        PROXMOX_HOST: ${{ secrets.PROXMOX_HOST }}
+        PROXMOX_USER: ${{ secrets.PROXMOX_USER }}
+        PROXMOX_PASSWORD: ${{ secrets.PROXMOX_PASSWORD }}
+      run: |
+        ansible-playbook configure_vm.yml \
+          -e proxmox_host=$PROXMOX_HOST \
+          -e proxmox_user=$PROXMOX_USER \
+          -e proxmox_password=$PROXMOX_PASSWORD
